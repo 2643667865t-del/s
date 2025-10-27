@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加拿大28 - 最终修正版 (倒计时修复)</title>
+    <style>
+        /* [CSS START] 样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* 头部导航栏样式 - 已去除，但保留相关类以防万一 */
+        .header {
+            /* 样式被移除，但保留类名 */
+            display: none; 
+        }
+
+        /* 新增的顶部标题图片容器样式 */
+        .top-title-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 10px; /* 增加一点间隔 */
+        }
+        
+        /* ----------------------------------------------------- */
+        /* ** 关键增强：图片和容器样式 (适用于所有 .ad-banner) ** */
+        /* ----------------------------------------------------- */
+
+        /* 广告容器 */
+        .ad-banner {
+            padding: 5px 0; 
+            text-align: center;
+            background-color: #f8f8f8;
+            margin: 10px auto; /* 居中容器 */
+            min-height: 50px; /* 强制最小高度，防止容器塌陷 */
+        }
+        
+        /* 广告链接 */
+        .ad-banner a { 
+            display: inline-block; 
+            max-width: 100%;
+            /* 即使图片不显示，也让 alt 文本明显 */
+            min-height: 50px; 
+            line-height: 50px;
+            text-decoration: none;
+            color: #cc0000;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #ffeeee;
+            border: 1px dashed #cc0000;
+        }
+
+
+        /* 图片自身样式 */
+        .ad-banner img {
+            display: block; 
+            width: 100%; 
+            height: auto; /* 保证比例 */
+            border-style: none; 
+            margin: 0 auto; /* 居中 */
+            max-width: 100%;
+        }
+
+        /* ----------------------------------------------------- */
+        
+        /* 结果展示区样式 */
+        .result-display-area {
+            padding: 20px 15px;
+            text-align: center;
+        }
+
+        .latest-issue {
+            color: #888;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .calculation-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* 修正后的数字和结果框尺寸 */
+        .num-box, .total-box, .result-tag {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px; 
+            border-radius: 6px; 
+            font-weight: bold;
+            font-size: 16px; 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .num-box {
+            width: 30px; 
+            background-color: #eee;
+            color: #333;
+        }
+
+        .op-sign {
+            font-size: 18px;
+            color: #888;
+            font-weight: normal;
+        }
+
+        .total-box {
+            min-width: 45px; 
+            background-color: #ff9933;
+            color: #fff;
+        }
+
+        .result-tag {
+            min-width: 45px; 
+            margin-left: 10px;
+        }
+
+        .tag-green {
+            background-color: #5cb85c;
+            color: #fff;
+        }
+
+        .tag-orange {
+            background-color: #ff9933;
+            color: #fff;
+        }
+
+        /* 倒计时区域样式 */
+        .next-issue-countdown {
+            font-size: 16px;
+            color: #333;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .time-box {
+            display: inline-block;
+            width: 30px; 
+            height: 30px; 
+            line-height: 30px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 18px; 
+            font-weight: bold;
+            color: #fff;
+            margin: 0 5px;
+        }
+
+        .time-box.orange {
+            background-color: #ff9933;
+        }
+
+        /* Tab 导航栏样式 */
+        .tabs-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        /* Tab 内容样式 */
+        .tab-content {
+            display: none; 
+            padding: 0 5px; 
+        }
+
+        .tab-content.active {
+            display: block; 
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed; 
+        }
+
+        /* 通用表格样式 (结果 Tab) */
+        .data-table th, .data-table td {
+            padding: 8px 3px; 
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            word-break: break-all;
+        }
+
+        .data-table th {
+            background-color: #f9f9f9;
+            font-weight: normal;
+            color: #666;
+            font-size: 12px; 
+        }
+        
+        /* 走势图特殊样式 (走势图 Tab) */
+        .trend-table td {
+            font-size: 11px; 
+            padding: 3px 1px; 
+            min-width: 25px; 
+        }
+        
+        /* 走势图列宽比例分配 */
+        .trend-table thead th:nth-child(1) { width: 22%; } 
+        .trend-table thead th:nth-child(2) { width: 8%; } 
+        .trend-table thead th:nth-child(n+3) { width: 8.75%; } 
+        
+        /* 间隔行字体需要更粗 */
+        #interval-row td {
+            font-weight: bold;
+            color: #333;
+        }
+
+
+        .trend-tag {
+            display: inline-block;
+            padding: 2px 3px; 
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+            min-width: 20px;
+            line-height: 1;
+        }
+
+        .tag-big { background-color: #e74c3c; } 
+        .tag-small { background-color: #a4c95f; } 
+        .tag-single { background-color: #ff9933; } 
+        .tag-double { background-color: #5cb85c; } 
+        .tag-bigsingle { background-color: #e74c3c; } 
+        .tag-bigdouble { background-color: #5cb85c; } 
+        .tag-smallsingle { background-color: #ff9933; } 
+        .tag-smalldouble { background-color: #a4c95f; } 
+        
+        /* 预测结果样式 */
+        .prediction-result-correct {
+            color: #5cb85c; 
+            font-weight: bold;
+        }
+        .prediction-result-incorrect {
+            color: #e74c3c; 
+            font-weight: bold;
+        }
+        
+        /* 预测下一期样式 */
+        #next-prediction-row td {
+            font-weight: bold;
+            color: #007bff;
+            background-color: #eef5ff;
+        }
+
+
+        .footer-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+
+        .footer-bar a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        /* 底部新文本样式 */
+        .footer-text {
+            color: #333; 
+            font-size: 12px;
+        }
+
+        /* [CSS END] */
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <a href="https://t.me/svip57" target="_blank">
+            <img src="top_title_ad.jpg" 
+                 alt="顶部标题广告图" 
+                 class="top-title-image" 
+                 loading="eager">
+        </a>
+        <div class="ad-banner">
+            <a href="http://412.ceo" target="_blank">
+                <img id="top-ad-image" 
+                     src="ad_banner.jpg" 
+                     alt="点击跳转 http://412.ceo" 
+                     width="100%" 
+                     height="auto" 
+                     max-width="600px" 
+                     loading="eager">
+            </a>
+        </div>
+        
+        <div class="ad-banner">
+            <a href="http://724.ceo/" target="_blank">
+                <img id="bottom-ad-image" 
+                     src="ad_banner_2.jpg" 
+                     alt="点击跳转 http://724.ceo/" 
+                     width="100%" 
+                     height="auto" 
+                     max-width="600px" 
+                     loading="eager">
+            </a>
+        </div>
+
+
+        <section class="result-display-area">
+            <div class="latest-issue">最新: <span id="current-issue">---</span> 期</div>
+            <div class="calculation-row">
+                <span class="num-box" id="num-1">--</span>
+                <span class="op-sign">+</span>
+                <span class="num-box" id="num-2">--</span>
+                <span class="op-sign">+</span>
+                <span class="num-box" id="num-3">--</span>
+                <span class="op-sign">=</span>
+                <span class="total-box" id="total-sum">--</span>
+                <span class="result-tag tag-green" id="result-size">--</span>
+                <span class="result-tag tag-orange" id="result-parity">--</span>
+            </div>
+            
+            <div class="next-issue-countdown">
+                下一期：
+                <span class="time-box orange" id="min-box">00</span>
+                分
+                <span class="time-box orange" id="sec-box">00</span>
+                秒
+            </div>
+        </section>
+
+        <section class="tabs-navigation">
+            <div class="tab active" data-target="result-content">结果</div>
+            <div class="tab" data-target="chart-content">走势图</div>
+            <div class="tab" data-target="prediction-content">预测</div>
+        </section>
+        
+        <div class="tab-content active" id="result-content">
+            <table class="data-table">
+                <thead>
+                    <tr><th>期号</th><th>时间</th><th>结果</th></tr>
+                </thead>
+                <tbody id="result-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="tab-content" id="chart-content">
+            <table class="data-table trend-table">
+                <thead>
+                    <tr id="trend-header">
+                        <th>期号</th>
+                        <th>值</th>
+                        <th>大</th>
+                        <th>小</th>
+                        <th>单</th>
+                        <th>双</th>
+                        <th>大单</th>
+                        <th>大双</th>
+                        <th>小单</th>
+                        <th>小双</th>
+                    </tr>
+                </thead>
+                <tbody id="chart-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="tab-content" id="prediction-content">
+            <table class="data-table">
+                <thead>
+                    <tr><th>期号</th><th>开奖</th><th>预测</th><th>结果</th></tr>
+                </thead>
+                <tbody id="prediction-body">
+                    </tbody>
+            </table>
+        </div>
+        
+    </div>
+    
+    <footer class="footer-bar">
+        <span class="footer-text">合作:@lipu3888888</span>
+    </footer>
+
+    <script>
+        /* [JS START] 接口对接和核心逻辑 */
+        
+        // ** 您的接口配置 **
+        const API_URL = 'https://pc28.help/kj.json?limit=100';
+        // 倒计时周期改为 215 秒 (3分35秒)
+        const COUNTDOWN_CYCLE = 215; 
+        const TREND_TYPES = ['大', '小', '单', '双', '大单', '大双', '小单', '小双'];
+        
+        
+        // --- 新增：热力值预测所需常量 ---
+        const T_PERIODS = 10; // 统计期数 T
+        const ALPHA = 0.6; // 权重系数 α
+        const BETA = 0.4; // 权重系数 β
+        
+        // 加拿大 28 总和的基础概率 P(n) - 基于 1000 种组合
+        const PROBABILITY_MAP = {
+            0: 0.001, 1: 0.003, 2: 0.006, 3: 0.010, 4: 0.015, 
+            5: 0.021, 6: 0.028, 7: 0.036, 8: 0.045, 9: 0.055, 
+            10: 0.063, 11: 0.069, 12: 0.073, 13: 0.075, 14: 0.075, 
+            15: 0.073, 16: 0.069, 17: 0.063, 18: 0.055, 19: 0.045, 
+            20: 0.036, 21: 0.028, 22: 0.021, 23: 0.015, 24: 0.010, 
+            25: 0.006, 26: 0.003, 27: 0.001
+        };
+        
+        // 四种组合及其包含的数字范围
+        const COMBINATION_RANGES = {
+            '小单': [1, 3, 5, 7, 9, 11, 13], 
+            '小双': [0, 2, 4, 6, 8, 10, 12],
+            '大单': [15, 17, 19, 21, 23, 25, 27],
+            '大双': [14, 16, 18, 20, 22, 24, 26]
+        };
+
+        // --- 核心预测函数：基于热力值计算 ---
+        /**
+         * 计算下一期预测结果（基于热力值 H(n)）
+         * @param {Array<Object>} historyData - 历史开奖数据数组。
+         * @returns {string} - 预测结果 (大单, 小双, 大双, 小单)。
+         */
+        function getHotnessPrediction(historyData) {
+            // 如果历史数据不足 T 期，无法准确计算热力值，返回默认值
+            if (historyData.length < T_PERIODS) {
+                return '---'; 
+            }
+            
+            // 1. 统计最近 T 期的频率 F(n)
+            const recentData = historyData.slice(0, T_PERIODS);
+            const frequencyMap = {};
+            for (let i = 0; i <= 27; i++) {
+                frequencyMap[i] = 0;
+            }
+
+            recentData.forEach(item => {
+                const sum = parseInt(item.sum);
+                if (sum >= 0 && sum <= 27) {
+                    frequencyMap[sum]++;
+                }
+            });
+
+            // 2. 计算每个数字的热力值 H(n)
+            const hotnessMap = {};
+            for (let n = 0; n <= 27; n++) {
+                const Pn = PROBABILITY_MAP[n] || 0;
+                const Fn = frequencyMap[n];
+                
+                // H(n) = α×P(n) + β×(F(n)/T)
+                const Hn = (ALPHA * Pn) + (BETA * (Fn / T_PERIODS));
+                hotnessMap[n] = Hn;
+            }
+
+            // 3. 计算每个组合的平均热力值（用于追热）
+            const combinationHotness = {};
+            
+            for (const combo in COMBINATION_RANGES) {
+                const numbers = COMBINATION_RANGES[combo];
+                let totalHotness = 0;
+                numbers.forEach(n => {
+                    totalHotness += hotnessMap[n];
+                });
+                // 计算平均热力值
+                combinationHotness[combo] = totalHotness / numbers.length;
+            }
+
+            // 4. 确定预测结果：追热（选择平均热力值最高的组合）
+            let maxHotness = -1;
+            let predictedCombo = '---';
+
+            for (const combo in combinationHotness) {
+                if (combinationHotness[combo] > maxHotness) {
+                    maxHotness = combinationHotness[combo];
+                    predictedCombo = combo;
+                }
+            }
+            
+            return predictedCombo;
+        }
+
+
+        /**
+         * 计算大小、单双和四种组合
+         */
+        function calculateResultTags(sum) {
+            const isBig = (sum >= 14 && sum <= 27);
+            const isSmall = (sum >= 0 && sum <= 13);
+            const isSingle = (sum % 2 !== 0);
+            const isDouble = (sum % 2 === 0);
+
+            const size = isBig ? '大' : (isSmall ? '小' : '中');
+            const parity = isSingle ? '单' : '双';
+            
+            let combined = '';
+            // 中（13, 14）在组合判断中需要特殊处理，但通常加拿大 28 默认 14 及以上为大
+            if (isBig && isSingle) combined = '大单';
+            else if (isBig && isDouble) combined = '大双';
+            else if (isSmall && isSingle) combined = '小单';
+            else if (isSmall && isDouble) combined = '小双';
+
+            return { size, parity, combined, isBig, isSmall, isSingle, isDouble };
+        }
+        
+        /**
+         * (省略：calculateTrendData - 走势图计算逻辑)
+         * 保持原样，未修改。
+         */
+        function calculateTrendData(historyData) {
+            const processedHistory = [];
+            // 1. 预处理数据：计算每期的所有结果类型
+            historyData.forEach(item => {
+                const sum = parseInt(item.sum);
+                const tags = calculateResultTags(sum);
+
+                item.sumResult = tags;
+                item.activeTypes = [];
+                if (tags.isBig) item.activeTypes.push('大');
+                if (tags.isSmall) item.activeTypes.push('小');
+                if (tags.isSingle) item.activeTypes.push('单');
+                if (tags.isDouble) item.activeTypes.push('双');
+                if (tags.combined) item.activeTypes.push(tags.combined);
+                processedHistory.push(item);
+            });
+            
+            // 2. 计算间隔：从最新一期开始向后追溯
+            const intervalCounters = {};
+            TREND_TYPES.forEach(type => { intervalCounters[type] = 0; });
+            processedHistory.forEach(item => { item.trendDisplay = {}; TREND_TYPES.forEach(type => { item.trendDisplay[type] = ''; }); });
+            
+            for (let i = 0; i < processedHistory.length; i++) {
+                const item = processedHistory[i];
+                const activeTypes = item.activeTypes;
+                TREND_TYPES.forEach(type => {
+                    if (activeTypes.includes(type)) {
+                        item.trendDisplay[type] = type;
+                        intervalCounters[type] = 0;
+                    } else {
+                        item.trendDisplay[type] = intervalCounters[type] > 0 ? intervalCounters[type] : 0;
+                        intervalCounters[type]++; 
+                    }
+                });
+            }
+            
+            // 3. 计算最终的“间隔”行数据
+            const finalIntervals = {};
+            TREND_TYPES.forEach(type => {
+                finalIntervals[type] = 0;
+                for (let i = 0; i < processedHistory.length; i++) {
+                    if (processedHistory[i].activeTypes.includes(type)) {
+                        break;
+                    }
+                    finalIntervals[type]++;
+                }
+            });
+
+            return { finalIntervals, processedHistory };
+        }
+
+
+        /**
+         * 修正：注入预测数据到“预测”表格 (包含下一期)
+         */
+        function injectPredictionData(dataArray) {
+            const predictionBody = document.getElementById('prediction-body');
+            predictionBody.innerHTML = '';
+            
+            // 1. **新增：预测下一期**
+            if (dataArray.length > 0) {
+                const latestQihao = parseInt(dataArray[0].qihao);
+                const nextQihao = latestQihao + 1;
+                
+                // 调用热力值预测函数
+                const predictedTag = getHotnessPrediction(dataArray); 
+                
+                const nextRow = predictionBody.insertRow();
+                nextRow.id = 'next-prediction-row';
+                nextRow.innerHTML = `
+                    <td>${nextQihao}</td>
+                    <td>--</td>
+                    <td>${predictedTag}</td>
+                    <td>--</td>
+                `;
+            }
+
+            // 2. 注入历史记录 (显示最近 10 期)
+            const displayData = dataArray.slice(0, 10); 
+            
+            displayData.forEach((item, index) => {
+                const qihao = item.qihao;
+                
+                // 预测该期结果时，统计数据应排除该期本身 (使用 item.slice(index+1) )
+                const historyForPrediction = dataArray.slice(index + 1);
+                const predictedTag = getHotnessPrediction(historyForPrediction); 
+                
+                // --- 获取开奖号码和总和，用于“开奖”列 ---
+                const openingData = `${item.opennum}=${item.sum}`; 
+                // ---------------------------------------------
+
+                const { size, parity, combined } = calculateResultTags(parseInt(item.sum));
+                const actualResult = combined; 
+                
+                // ** 恢复“匹配一半即为对”的逻辑**
+                const predictedSize = predictedTag.includes('大') ? '大' : (predictedTag.includes('小') ? '小' : '');
+                const predictedParity = predictedTag.includes('单') ? '单' : (predictedTag.includes('双') ? '双' : '');
+                
+                const actualSize = size;
+                const actualParity = parity;
+
+                const isSizeMatch = predictedSize === actualSize;
+                const isParityMatch = predictedParity === actualParity;
+
+                const isCorrect = isSizeMatch || isParityMatch; // 至少一个匹配就算对
+                // -----------------------------------------------------
+                
+                const resultText = isCorrect ? '对 ✅' : '错 ❌';
+                const resultClass = isCorrect ? 'prediction-result-correct' : 'prediction-result-incorrect';
+
+                const row = predictionBody.insertRow();
+                row.innerHTML = `
+                    <td>${qihao}</td>
+                    <td>${openingData}</td>
+                    <td>${predictedTag}</td>
+                    <td class="${resultClass}">${actualResult} (${resultText})</td>
+                `;
+            });
+        }
+
+
+        // --- 核心历史数据注入函数 (保持稳定) ---
+        function injectHistoryData(dataArray) {
+            const resultBody = document.getElementById('result-body');
+            const chartBody = document.getElementById('chart-body');
+            
+            // 清空旧数据
+            resultBody.innerHTML = '';
+            chartBody.innerHTML = '';
+            
+            // 1. 注入到“结果”表格 (结果 Tab)
+            dataArray.slice(0, 30).forEach(item => {
+                const [n1, n2, n3] = item.opennum.split('+').map(n => parseInt(n));
+                const sum = parseInt(item.sum);
+                
+                const rowResult = resultBody.insertRow();
+                const displayTime = item.opentime.replace(/\d{4}-/, ''); 
+                rowResult.innerHTML = `
+                    <td>${item.qihao}</td>
+                    <td>${displayTime}</td>
+                    <td>${n1}+${n2}+${n3}=${sum}</td>
+                `;
+            });
+
+            // 2. 注入到“走势图”表格 (走势图 Tab)
+            const { finalIntervals, processedHistory } = calculateTrendData(dataArray);
+            
+            const intervalRow = chartBody.insertRow(0);
+            intervalRow.id = 'interval-row';
+            intervalRow.innerHTML = `
+                <td>间隔</td>
+                <td></td>
+                <td>${finalIntervals['大']}</td>
+                <td>${finalIntervals['小']}</td>
+                <td>${finalIntervals['单']}</td>
+                <td>${finalIntervals['双']}</td>
+                <td>${finalIntervals['大单']}</td>
+                <td>${finalIntervals['大双']}</td>
+                <td>${finalIntervals['小单']}</td>
+                <td>${finalIntervals['小双']}</td>
+            `;
+
+            processedHistory.slice(0, 30).forEach(item => {
+                const rowChart = chartBody.insertRow();
+                let rowContent = `<td>${item.qihao}</td><td>${parseInt(item.sum)}</td>`;
+                TREND_TYPES.forEach(type => {
+                    const displayValue = item.trendDisplay[type];
+                    if (typeof displayValue === 'string') {
+                        let className = '';
+                        if (type === '大') className = 'tag-big';
+                        else if (type === '小') className = 'tag-small';
+                        else if (type === '单') className = 'tag-single';
+                        else if (type === '双') className = 'tag-double';
+                        else if (type === '大单') className = 'tag-bigsingle';
+                        else if (type === '大双') className = 'tag-bigdouble';
+                        else if (type === '小单') className = 'tag-smallsingle';
+                        else if (type === '小双') className = 'tag-smalldouble';
+                        
+                        rowContent += `<td><span class="trend-tag ${className}">${displayValue}</span></td>`;
+                    } else {
+                        rowContent += `<td></td>`; 
+                    }
+                });
+                rowChart.innerHTML = rowContent;
+            });
+            
+            // 3. 注入到“预测”表格 (包含下一期预测)
+            injectPredictionData(dataArray);
+        }
+        
+        // --- 核心页面更新函数 (用于接口成功调用后更新 UI) ---
+        function updatePage(latestResult) {
+            const [n1, n2, n3] = latestResult.opennum.split('+').map(n => parseInt(n));
+            const sum = parseInt(latestResult.sum);
+            const { size, parity } = calculateResultTags(sum);
+
+            // 1. 更新顶部最新结果
+            document.getElementById('current-issue').textContent = latestResult.qihao;
+            document.getElementById('num-1').textContent = n1;
+            document.getElementById('num-2').textContent = n2;
+            document.getElementById('num-3').textContent = n3;
+            document.getElementById('total-sum').textContent = sum;
+            
+            // 2. 更新大小单双标签
+            const resultSize = document.getElementById('result-size');
+            resultSize.textContent = size;
+            resultSize.className = `result-tag ${size === '大' ? 'tag-green' : 'tag-orange'}`;
+
+            const resultParity = document.getElementById('result-parity');
+            resultParity.textContent = parity;
+            resultParity.className = `result-tag ${parity === '单' ? 'tag-orange' : 'tag-green'}`;
+        }
+        
+        // --- 实时倒计时功能 (已根据您的成功逻辑参考修改) ---
+        let countdownInterval;
+        
+        /**
+         * 基于目标时间戳进行精确倒计时
+         * @param {number} targetTimestamp - 下一期开奖的毫秒时间戳。
+         */
+        function startCountdown(targetTimestamp) {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            const minBox = document.getElementById('min-box');
+            const secBox = document.getElementById('sec-box');
+
+            if (!minBox || !secBox) return;
+
+            function updateCountdown() {
+                const nowTimestamp = Date.now();
+                const diff = targetTimestamp - nowTimestamp;
+
+                if (diff < 1000) {
+                    minBox.textContent = '00';
+                    secBox.textContent = '00';
+                    clearInterval(countdownInterval); 
+                    
+                    // 倒计时归零，触发接口调用
+                    console.log("[倒计时结束] 准备获取新一期数据...");
+                    fetchLatestResult();
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+
+                minBox.textContent = String(minutes).padStart(2, '0');
+                secBox.textContent = String(seconds).padStart(2, '0');
+            }
+
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+            console.log(`[倒计时启动] 目标时间戳: ${targetTimestamp} (${new Date(targetTimestamp).toLocaleTimeString()})。`);
+        }
+
+
+        // ** 接口接入点：获取最新数据和历史数据 (已根据您的成功逻辑参考修改) **
+        function fetchLatestResult() {
+            console.log(`[接口请求] 正在请求最新数据: ${API_URL}`);
+            
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络请求错误: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.data && data.data.length > 0) {
+                        const latestResult = data.data[0];
+                        
+                        // 1. 更新顶部最新一期结果和表格
+                        updatePage(latestResult);
+                        injectHistoryData(data.data);
+                        
+                        // 2. **核心修正：启动精确倒计时** (参考您提供的逻辑)
+                        
+                        // 兼容性时间解析：将 '2023-10-27 10:00:00' 转换为 '2023/10/27 10:00:00'
+                        const compatibleOpenTimeStr = latestResult.opentime.replace(/-/g, '/');
+                        
+                        let latestOpenTimeDate = new Date(compatibleOpenTimeStr);
+                        
+                        // 额外的容错：如果年份不对，尝试加入当前年份（应对API只返回月日的问题，虽然当前API格式完整）
+                        if (latestOpenTimeDate.getFullYear() !== new Date().getFullYear() && compatibleOpenTimeStr.length <= 16) { 
+                            latestOpenTimeDate = new Date(`${new Date().getFullYear()}/${compatibleOpenTimeStr}`);
+                        }
+
+                        if (isNaN(latestOpenTimeDate.getTime())) {
+                            throw new Error('API时间解析失败。');
+                        }
+                        
+                        const latestOpenTime = latestOpenTimeDate.getTime();
+                        
+                        // 严格根据开奖时间 + 周期时长 来计算下一期开奖目标时间戳
+                        const nextOpenTimeTimestamp = latestOpenTime + (COUNTDOWN_CYCLE * 1000);
+                        
+                        startCountdown(nextOpenTimeTimestamp);
+                        
+                    } else {
+                        console.error("[接口错误] 接口返回数据为空或格式不正确。");
+                        startCountdown(Date.now() + 30000); // 30秒后重试
+                    }
+                })
+                .catch(error => {
+                    console.error("[接口错误] 调用失败:", error);
+                    startCountdown(Date.now() + 30000); // 失败后 30 秒后重试
+                });
+        }
+
+        // --- Tab 切换功能 (稳定版本) ---
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tabs-navigation .tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.getAttribute('data-target');
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    contents.forEach(c => c.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        }
+        
+        // --- 初始化所有功能 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTabs();
+            
+            // 首次加载页面时，立即获取最新结果并启动倒计时
+            fetchLatestResult(); 
+        });
+        /* [JS END] */
+    </script>
+</body>
+</html>
